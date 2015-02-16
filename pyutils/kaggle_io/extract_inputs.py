@@ -37,6 +37,7 @@ def extract_training_data(fname):
 
     return Id, X, Y
 
+
 # Extract ndarrays from KaggleChallenge1 testing files.
 def extract_testing_data(fname):
     """
@@ -65,6 +66,7 @@ def extract_testing_data(fname):
     Id, X = arr[:, 1], arr[:,1:]
 
     return Id, X
+
 
 # Unit tests
 if __name__ == '__main__':
