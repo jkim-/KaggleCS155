@@ -1,5 +1,3 @@
-import numpy as np
-from scipy.stats import mode
 
 # Class for a cross validated models used in ensemble selection.
 class CvModel:
@@ -26,6 +24,8 @@ class CvModel:
         # Predict out of sample labels. This could be any X_test.
         cv_model.predict(X_test)
     """
+
+    import numpy as np
 
     def __init__(self, n_folds, trans, clf):
         self.trans = trans
@@ -145,6 +145,7 @@ class CvModel:
 
 if __name__ == '__main__':
 
+    import numpy as np
     import sys
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
