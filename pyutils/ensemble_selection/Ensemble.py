@@ -97,7 +97,10 @@ class Ensemble:
 
 if __name__ == '__main__':
 
-    from pyutils.kaggle_io.extract_inputs import extract_training_data, extract_testing_data
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from kaggle_io.extract_inputs import extract_training_data, extract_testing_data
 
     print 'Reading data...'
     Id_train, X_train, y_train = extract_training_data('data/kaggle_train_tf_idf.csv')

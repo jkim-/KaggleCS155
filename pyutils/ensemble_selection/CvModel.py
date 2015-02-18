@@ -145,7 +145,10 @@ class CvModel:
 
 if __name__ == '__main__':
 
-    from pyutils.kaggle_io.extract_inputs import extract_training_data, extract_testing_data
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from kaggle_io.extract_inputs import extract_training_data, extract_testing_data
 
     from sklearn.preprocessing import StandardScaler
     from sklearn.ensemble import RandomForestClassifier
@@ -168,10 +171,10 @@ if __name__ == '__main__':
     cv_rf.fit(X_train, y_train)
 
     print 'Pickling...'
-    joblib.dump(cv_rf, 'random_forests/rf1.pkl')
+    joblib.dump(cv_rf, 'rf1/rf1.pkl')
 
     print 'UnPickling...'
-    cv_rf_pkl = joblib.load('random_forests/rf1.pkl')
+    cv_rf_pkl = joblib.load('rf1/rf1.pkl')
 
     print 'Check hill_predict of pickle and unpickled CvModel... (should have single True)'
     print np.unique(cv_rf_pkl.hill_predict(X_train) == cv_rf.hill_predict(X_train))
