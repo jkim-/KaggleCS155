@@ -2,8 +2,11 @@ import numpy as np
 from numpy import linalg
 import matplotlib.pyplot as plt
 
-from pyutils.preprocessing.InputPreprocessor import InputPreprocessor
-from pyutils.kaggle_io.extract_inputs import extract_training_data
+import sys
+from os import path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from kaggle_io.extract_inputs import extract_training_data
+from InputPreprocessor import InputPreprocessor
 
 # Read in tf_idf training data.
 Id, X, Y = extract_training_data('data/kaggle_train_tf_idf.csv')
@@ -38,6 +41,6 @@ plt.title(r'Reconstruction error v.s. top-$k$ components', fontsize=20)
 plt.xlabel(r'$k$', fontsize=20)
 plt.ylabel('Reconstruction Error', fontsize=20)
 plt.grid(True)
-plt.savefig('plots/top-k_PCA.pdf', bbox_inches='tight')
+plt.savefig('top-k_PCA.pdf', bbox_inches='tight')
 plt.show()
 
