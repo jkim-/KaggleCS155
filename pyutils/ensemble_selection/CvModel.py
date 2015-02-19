@@ -33,7 +33,7 @@ class CvModel:
         self.models = None
 
     # Fit the model.
-    def fit(self, X, y):
+    def fit(self, X, y, sample_weight=None):
         """
         Train the cross-validated model using the training data X and y.
 
@@ -43,7 +43,11 @@ class CvModel:
                This is the training design matrix.
 
             y: ndarray of shape (n_training_examples, ).
-               These are the training taret labels.
+               These are the training target labels.
+
+            sample_weight: ndarray of shape (n_training_examples, ).
+                           These are the training example weights.
+                           Default: None.
 
         Output/Side effect:
 
@@ -68,9 +72,14 @@ class CvModel:
             # Get the folds to train on. Leave the ith fold out of training.
             X_fold = np.concatenate([X[:i*fold_size], X[(i+1)*fold_size:]])
             y_fold = np.concatenate([y[:i*fold_size], y[(i+1)*fold_size:]])
+            sample_weight_fold = None
+            if sample_weight is not None:
+                sample_weight_fold = np.concatenate(
+                    [sample_weight[:i*fold_size], sample_weight[(i+1)*fold_size:]]
+                )
 
             # Train using the cached classifier prototype.
-            models.append(self.clf.fit(X_fold, y_fold))
+            models.append(self.clf.fit(X_fold, y_fold, sample_weight=sample_weight_fold))
 
         self.models = models
 
