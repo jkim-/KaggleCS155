@@ -1,9 +1,76 @@
 svm_rbf:
+
+    Number of models:
+        176
+
     Input Preprocessing:
         MinMaxScaler(feature_range=(-1.,1.))
-        PCA(n_components=None, whiten=True)
+        PCA(n_components=[200, None], whiten=True)
+
     Classifier:
         SVC(C=[float(10**x) for x in range(-7, 4)], 
             kernel='rbf',
             gamma=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1., 2.]
         )
+
+
+svm_poly:
+
+    Number of models:
+        66
+
+    Input Preprocessing:
+        MinMaxScaler(feature_range=(-1.,1.))
+        PCA(n_components=[200, None], whiten=True)
+
+    Classifier:
+        SVC(C=[float(10**x) for x in range(-7, 4)], 
+            kernel='poly',
+            degree=[2, 3, 5]
+        )
+
+
+svm_lin: 
+    
+    Number of models:
+        22
+
+    Input Preprocessing:
+        MinMaxScaler(feature_range=(-1.,1.))
+        PCA(n_components=[200, None], whiten=True)
+
+    Classifier:
+        SVC(C=[float(10**x) for x in range(-7, 4)], 
+            kernel='lin'
+        )
+
+
+rf_std: 
+
+    Number of models:
+        36
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+        RandomForestClassifier(
+		n_estimators=[256, 512, 1024],
+		max_features=[int(1.5**x * np.sqrt(500)) for x in range(-5,7)]
+        )
+
+
+bdt_std:
+
+    Number of models:
+        112 
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+    	dtclf = DecisionTreeClassifier(max_depth=[1, 2, 3, 4, 5, 7, 10, 20])
+    	AdaBoostClassifier(
+		base_estimator=dtclf,
+		n_estimators=[int(1.5**x) for x in range(1,15)]
+    	)
