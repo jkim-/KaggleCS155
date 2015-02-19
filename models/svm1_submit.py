@@ -16,7 +16,7 @@ param_list = [
     [2, 3], # degree (of polynomial kernel)
     [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1., 2.], # gamma (of rbf kernel)
     [float(10**x) for x in range(-5,-2)], # tol
-    [200,'None'] # n_components (for pca)
+    [200,'None'], # n_components (for pca)
     ['True'] # whiten (for pca)
 ]
 
