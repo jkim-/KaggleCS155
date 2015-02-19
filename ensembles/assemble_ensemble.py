@@ -25,9 +25,15 @@ if __name__ == '__main__':
         except StopIteration:
             break
 
-    print 'Hill climbing...'
+    print 'Hill climbing...\n'
     ensemble = Ensemble()
-    ensemble.fit(X_train, y_train, H, verbose=True)
+    ensemble.fit(
+        X_train, y_train, H,
+        n_init=10,
+        bag_rounds=20,
+        bag_p=0.2,
+        prune_p=0.5,
+        verbose=True)
 
     print 'Ensemble hill predict:'
     err = hamming(ensemble.hill_predict(X_train), y_train)
