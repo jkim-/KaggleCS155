@@ -11,7 +11,7 @@ import itertools
 import getpass
 
 param_list = [
-    [int(2**x) for x in range(0,8))], # n_estimators
+    [int(2**x) for x in range(0,8)], # n_estimators
     [1, 2, 3, 4, 5, 7, 10, 20], # max_depth 
 ]
 
