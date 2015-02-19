@@ -25,7 +25,6 @@ if __name__ == '__main__':
 
     Id, X, y = extract_training_data('/nfs/raid13/babar/dchao/KaggleCS155/data/kaggle_train_tf_idf.csv')
 
-    # trans/clf specs
     n_folds = 5
     scaler = MinMaxScaler(feature_range=(-1,1)).fit(X)
     clf = SVC(
@@ -34,6 +33,5 @@ if __name__ == '__main__':
     )
 
     cv_clf = CvModel(n_folds, scaler, clf)
-    cv_clf = CvModel(n_folds, trans, clf)
     cv_clf.fit(X, y)
     joblib.dump(cv_clf, args.model_fname)

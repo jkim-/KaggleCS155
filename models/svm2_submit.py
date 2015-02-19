@@ -2,12 +2,16 @@
 
 import os
 import sys
-model_path = '/nfs/raid13/babar/dchao/KaggleCS155'
-sys.path.append(model_path)
+sys.path.append('/nfs/raid13/babar/dchao/KaggleCS155')
+import tempfile
+import subprocess
+import itertools
+import getpass
 
 param_list = [ 
     [ 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1e2, 1e3, 1e4, 1e5],
     [ 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1e2, 1e3, 1e4, 1e5 ]
+]
 
 for i, pars in enumerate(itertools.product(*param_list)):
     arguments = []
