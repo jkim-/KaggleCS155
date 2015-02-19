@@ -16,6 +16,7 @@ if __name__ == '__main__':
     model_rootdir = kaggle_root + '/models'
     model_dir = [
         'rf1',
+        'bdt1',
     ]
 
     prog = re.compile('.*\.pkl$')

@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from sklearn.externals import joblib
 from scipy.spatial.distance import hamming
@@ -35,7 +36,7 @@ class Ensemble:
         return (y_pred >= 0.5).astype(int)
 
     # Fit an ensemble of models.
-    def fit(self, X, y, H, rounds=None):
+    def fit(self, X, y, H, rounds=None, verbose=False):
         """
         This fits an ensemble of models given a library of models. This method
         implements what is known as "ensemble selection".
@@ -62,6 +63,10 @@ class Ensemble:
         # Foward selection
         if rounds is None: rounds = len(H)
         for i in range(rounds):
+
+            if verbose:
+                sys.stdout.write('hill climb round: {0}\n'.format(i))
+                sys.stdout.flush()
 
             # Find the model that improves the overall ensemble performance the
             # most. This is measured by the hill climbing cross validation error.
