@@ -1,2 +1,5 @@
 *.pkl
 *.npy
+*.log
+*.out
+*.error

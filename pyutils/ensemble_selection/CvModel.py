@@ -1,3 +1,4 @@
+import numpy as np
 
 # Class for a cross validated models used in ensemble selection.
 class CvModel:
@@ -24,8 +25,6 @@ class CvModel:
         # Predict out of sample labels. This could be any X_test.
         cv_model.predict(X_test)
     """
-
-    import numpy as np
 
     def __init__(self, n_folds, trans, clf):
         self.trans = trans
