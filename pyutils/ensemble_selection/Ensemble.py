@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from sklearn.externals import joblib
 from scipy.spatial.distance import hamming
+from operator import itemgetter
 
 # Class for an ensemble of cross-validated models.
 class Ensemble:
@@ -36,6 +37,8 @@ class Ensemble:
     # Fit an ensemble of models.
     def fit(self, X, y, H,
             n_init=0,
+            bag_rounds=0,
+            bag_p=1.0,
             rounds=None,
             verbose=False):
         """
@@ -55,6 +58,12 @@ class Ensemble:
                     first n_init models from H.
                     Default: 0.
 
+            bag_rounds: Number of rounds to bag.
+                        Default: 0.
+
+            bag_p: Proportion of models to use in each bagging iteration.
+                   Default: 1.0.
+
             rounds: Number of rounds for model selection. Default: len(H).
 
             verbose: Print diagnostics. Default: False.
@@ -63,32 +72,63 @@ class Ensemble:
             Populates self.models with models from H.
             Returns nothing.
         """
+        self.models = []
 
-        if rounds is None:
-            rounds = len(H)
+        # bag
+        H_list = []
+        if bag_rounds > 0:
+            for i in range(bag_rounds):
+                H_b = [ (i, h) for i, h in enumerate(H) ]
+                midx_list = np.random.permutation(len(H)).tolist()[:int(bag_p*len(H))]
+                H_b = [ H_b[i] for i in midx_list ]
+                H_b = sorted(H_b, key=itemgetter(0))
+                H_b = [ h[1] for h in H_b ]
+                H_list.append(H_b)
+        else:
+            H_list = [ H ]
 
-        # Initialize ensemble
-        self.models = H[:n_init]
-        votes = np.zeros(X.shape[0], dtype=float)
         if verbose:
-            print 'Initial ensemble size: {0}'.format(len(self.models))
+            if bag_rounds > 0:
+                print 'Bagging rounds: {0}'.format(len(H_list))
+                print 'Models library size in each round: {0}/{1}'.format(len(H_list[0]) , len(H))
+                print 'Initial ensemble size for each round: {0}\n'.format(n_init)
+            else:
+                print 'Initial ensemble size: {0}'.format(n_init)
 
-        # Foward selection
-        for i in range(rounds):
+        for j, H in enumerate(H_list):
 
-            err_min, hmin_pred, hmin = 1.0, None, None
-            for h in H:
-                h_pred = h.hill_predict(X)
-                enh_pred = ((votes + h_pred) / (i+1) >= 0.5).astype(int)
-                err = hamming(enh_pred, y.astype(int))
-                if err < err_min:
-                    err_min, hmin_pred, hmin = err, h_pred, h
+            if verbose and bag_rounds > 0:
+                print 'Bagging round {0}'.format(j+1)
 
-            self.models.append(hmin)
-            votes += hmin_pred
+            # Decide number of rounds for ensemble adding
+            if rounds is None:
+                rounds = len(H)
+
+            # Initialize ensemble
+            models = H[:n_init]
+            votes = np.zeros(X.shape[0], dtype=float)
+
+            # Foward selection
+            for i in range(rounds):
+
+                err_min, hmin_pred, hmin = 1.0, None, None
+                for h in H:
+                    h_pred = h.hill_predict(X)
+                    enh_pred = ((votes + h_pred) / (i+1) >= 0.5).astype(int)
+                    err = hamming(enh_pred, y.astype(int))
+                    if err < err_min:
+                        err_min, hmin_pred, hmin = err, h_pred, h
+
+                models.append(hmin)
+                votes += hmin_pred
+
+                if verbose:
+                    print 'Hillclimb round: {0}, Hillclimb error: {1}'.format(i+1, err_min)
+
+            self.models += models
 
             if verbose:
-                print 'Hillclimb round: {0}, Hillclimb error: {1}'.format(i+1, err_min)
+                print 'Current number of models in ensemble: {0}\n'.format(len(self.models))
 
     # Use the ensemble to predict labels for unseen/test examples.
     def predict(self, X):
@@ -133,7 +173,11 @@ if __name__ == '__main__':
 
     print 'Hill climbing...'
     ensemble = Ensemble()
-    ensemble.fit(X_train, y_train, H, n_init=2, verbose=True)
+    ensemble.fit(
+        X_train, y_train, H,
+        bag_rounds=4,
+        bag_p = 0.7,
+        n_init=2, verbose=True)
 
     print 'Predicting in sample...'
     pred = ensemble.hill_predict(X_train)
