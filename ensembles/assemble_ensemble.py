@@ -30,7 +30,7 @@ if __name__ == '__main__':
     ensemble.fit(X_train, y_train, H, verbose=True)
 
     print 'Ensemble hill predict:'
-    err = hamming(ensemble.hill_predict(ensemble.models, X_train), y_train)
+    err = hamming(ensemble.hill_predict(X_train), y_train)
     print err
 
     #print 'Predicting...'
