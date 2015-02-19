@@ -1,24 +1,23 @@
 #! /nfs/raid13/babar/software/anaconda/bin/python
 
 import sys
-from os import path
 sys.path.append('/nfs/raid13/babar/dchao/KaggleCS155')
 
 from pyutils.kaggle_io.extract_inputs import extract_training_data
 from pyutils.ensemble_selection.CvModel import CvModel
 from sklearn.externals import joblib
 
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
 
 if __name__ == '__main__':
     
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('C',
-                        help='Soft margin.')
-    parser.add_argument('gamma',
-                        help='Rbf width')
+    parser.add_argument('n_estimators',
+                        help='n_estimators of RandomForestClassifier.')
+    parser.add_argument('max_features',
+                        help='Number of features to split for RandomForestClassifier.')
     parser.add_argument('model_fname',
                         help='Absolute path to pickle the fitted CvModel.')
     args = parser.parse_args()
@@ -27,10 +26,10 @@ if __name__ == '__main__':
 
     # trans/clf specs
     n_folds = 5
-    scaler = MinMaxScaler(feature_range=(-1,1)).fit(X)
-    clf = SVC(
-        C=float(args.C),
-        gamma=float(args.gamma)
+    scaler = StandardScaler().fit(X)
+    clf = RandomForestClassifier(
+        n_estimators=int(args.n_estimators),
+        max_features=int(args.max_features)
     )
 
     cv_clf = CvModel(n_folds, scaler, clf)
