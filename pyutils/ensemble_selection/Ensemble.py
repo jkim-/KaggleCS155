@@ -39,11 +39,15 @@ class Ensemble:
             n_init=0,
             bag_rounds=0,
             bag_p=1.0,
+            prune_p=1.0,
             rounds=None,
             verbose=False):
         """
         This fits an ensemble of models given a library of models. This method
         implements what is known as "ensemble selection".
+
+        Note: The input models should be sorted in order of hill climbing accuracy.
+              i.e. H[i] is the ith best model in the library.
 
         Input:
 
@@ -64,6 +68,10 @@ class Ensemble:
             bag_p: Proportion of models to use in each bagging iteration.
                    Default: 1.0.
 
+            prune_p: Proportion of models to use in H.
+                     Takes the first (prune_p) * 100% models.
+                     Default: 1.0.
+
             rounds: Number of rounds for model selection. Default: len(H).
 
             verbose: Print diagnostics. Default: False.
@@ -73,6 +81,14 @@ class Ensemble:
             Returns nothing.
         """
         self.models = []
+
+        if verbose:
+            print 'Total number of models in library: {0}\n'.format(len(H))
+
+        # prune
+        H = H[:int(prune_p*len(H))]
+        if verbose and prune_p < 1.0:
+            print 'Total number of models after pruning library: {0}\n'.format(len(H))
 
         # bag
         H_list = []
@@ -177,7 +193,9 @@ if __name__ == '__main__':
         X_train, y_train, H,
         bag_rounds=4,
         bag_p = 0.7,
-        n_init=2, verbose=True)
+        prune_p = 0.8,
+        n_init=2,
+        verbose=True)
 
     print 'Predicting in sample...'
     pred = ensemble.hill_predict(X_train)
