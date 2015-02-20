@@ -1,4 +1,4 @@
-kaggle_root = '/Users/dchao/Documents/courses/cs155/projects/KaggleCS155'
+kaggle_root = '../'
 
 import sys
 sys.path.append(kaggle_root)
@@ -15,8 +15,15 @@ if __name__ == '__main__':
 
     model_rootdir = kaggle_root + '/models'
     model_dir = [
-        'rf1',
-        'bdt1',
+        'svm_rbf',
+        'svm_poly',
+        'svm_lin', 
+        'rf_std', 
+        'rf_bal',
+        'bdt_std',
+
+        'bdt_bal',
+        'lr_std',
     ]
 
     prog = re.compile('.*\.pkl$')
@@ -33,6 +40,7 @@ if __name__ == '__main__':
     print 'Loading models.'
     models = []
     for p in pkl_fnames:
+        print '\t{0}'.format(p)
         models.append((p, joblib.load(model_rootdir + '/' + p)))
 
     print 'Reading training data.'
