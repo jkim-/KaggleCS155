@@ -33,7 +33,7 @@ def extract_training_data(fname):
     arr = genfromtxt(fname, delimiter=',', skip_header=1)
 
     # Column order: Id, feature1, ..., featureD, Label.
-    Id, X, Y = arr[:, 1], arr[:,1:-1], arr[:,-1]
+    Id, X, Y = arr[:, 0], arr[:,1:-1], arr[:,-1]
 
     return Id, X, Y
 
@@ -63,7 +63,7 @@ def extract_testing_data(fname):
     arr = genfromtxt(fname, delimiter=',', skip_header=1)
 
     # Column order: Id, feature1, ..., featureD
-    Id, X = arr[:, 1], arr[:,1:]
+    Id, X = arr[:, 0], arr[:,1:]
 
     return Id, X
 
