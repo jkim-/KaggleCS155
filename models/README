@@ -60,6 +60,22 @@ rf_std:
         )
 
 
+rf_bal: 
+
+    Number of models:
+        36
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+        RandomForestClassifier(
+		n_estimators=[256, 512, 1024],
+		max_features=[int(1.5**x * np.sqrt(500)) for x in range(-5,7)]
+        )
+        sample_weights=[1. if yi == 0 else 3. for yi in y]
+
+
 bdt_std:
 
     Number of models:
