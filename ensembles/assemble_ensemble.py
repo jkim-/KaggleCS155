@@ -7,9 +7,9 @@ if __name__ == '__main__':
                               'ranked by hillclimb error. '))
     parser.add_argument('ensemble_output_dir',
                         help='Directory to pickle the ensemble.')
-    parser.add_argument('--prune_p', type=float, default=0.5,
+    parser.add_argument('--prune_p', type=float, default=0.2,
                         help=('The proportion of models to take. '
-                              'e.g. 0.5 means taking the top 50%% '
+                              'e.g. 0.5 means taking the top 20%% '
                               'ranked models in model_ranking_fname for '
                               'ensemble training. '))
     parser.add_argument('--n_init', type=int, default=10,
