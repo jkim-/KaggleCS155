@@ -1,50 +1,48 @@
-kaggle_root = '../'
-
-import sys
-sys.path.append(kaggle_root)
-import os
-import re
-from operator import itemgetter
-
-from pyutils.kaggle_io.extract_inputs import extract_training_data
-from pyutils.ensemble_selection.CvModel import CvModel
-from sklearn.externals import joblib
-from scipy.spatial.distance import hamming
-
 if __name__ == '__main__':
 
-    model_rootdir = kaggle_root + '/models'
-    model_dir = [
-        'svm_rbf',
-        'svm_poly',
-        'svm_lin', 
-        'rf_std', 
-        'rf_bal',
-        'bdt_std',
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('model_dirlist_fname',
+                        help=('File that contains list of model directories. ',
+                              'Each line is a directory; do not include any prefixes. ',
+                              'i.e. bdt1 instead of ~/models/bdt1'))
+    parser.add_argument('output_ranking_fname',
+                        help='Ranking output file. Will overwrite.')
+    parser.add_argument('--kaggle_root', default='../',
+                        help='Root directry of the kaggle project.')
+    args = parser.parse_args()
 
-        'bdt_bal',
-        'lr_std',
-    ]
+    import sys
+    sys.path.append(args.kaggle_root)
+    import os
+    import re
+    from operator import itemgetter
 
-    prog = re.compile('.*\.pkl$')
+    from pyutils.kaggle_io.extract_inputs import extract_training_data
+    from pyutils.ensemble_selection.CvModel import CvModel
+    from sklearn.externals import joblib
+    from scipy.spatial.distance import hamming
 
-    pkl_fnames = []
-    for m_dir in model_dir:
-        fname_list = os.listdir(model_rootdir + '/' + m_dir)
-        for fname in fname_list:
-            try:
-                pkl_fnames.append(m_dir + '/' + prog.match(fname).group(0))
-            except AttributeError:
-                continue
+    model_dirs = []
+    with open(args.model_dirlist_fname, 'r') as f:
+        for line in f:
+            model_dirs.append(line.strip())
 
     print 'Loading models.'
     models = []
-    for p in pkl_fnames:
-        print '\t{0}'.format(p)
-        models.append((p, joblib.load(model_rootdir + '/' + p)))
+    prog, model_rootdir = re.compile('.*\.pkl$'), args.kaggle_root + '/models'
+    for m_dir in model_dirs:
+        dir_contents = os.listdir(model_rootdir + '/' + m_dir)
+        for fname in dir_contents:
+            try:
+                model_name = m_dir + '/' + prog.match(fname).group(0)
+                print '\t{0}'.format(model_name)
+                models.append((model_name, joblib.load(model_rootdir + '/' + model_name)))
+            except AttributeError:
+                continue
 
     print 'Reading training data.'
-    Id, X, y = extract_training_data(kaggle_root + '/data/kaggle_train_tf_idf.csv')
+    Id, X, y = extract_training_data(args.kaggle_root + '/data/kaggle_train_tf_idf.csv')
 
     sys.stdout.write('Scoring')
     sys.stdout.flush()
@@ -57,19 +55,19 @@ if __name__ == '__main__':
     sys.stdout.write('\n\n')
     sys.stdout.flush()
 
-    f = open('model_library_ranking.txt', 'w')
 
-    print 'Ranking:'
+    print 'Ranking models.'
     print
 
-    hillclimb_errs = sorted(hillclimb_errs, key=itemgetter(1))
-    title_line = '{0:<20}{1:<20}'.format('model', 'hill_err')
-    print title_line
-    f.write(title_line + '\n')
-    for name, err in hillclimb_errs:
-        line = '{0:<20}{1:<20}'.format(name, round(err, 3))
-        print line
-        f.write(line + '\n')
-    print
+    with open(args.output_ranking_fname, 'w') as f:
 
-    f.close()
+        header_line = '{0:<20}{1:<20}'.format('model', 'hill_err')
+        f.write(header_line + '\n')
+
+        hillclimb_errs = sorted(hillclimb_errs, key=itemgetter(1))
+        for name, err in hillclimb_errs:
+            line = '{0:<20}{1:<20}'.format(name, round(err, 3))
+            f.write(line + '\n')
+
+    print 'Output written to {0}.'.format(args.output_ranking_fname)
+    print
