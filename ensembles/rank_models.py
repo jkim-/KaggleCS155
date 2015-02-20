@@ -3,9 +3,9 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('model_dirlist_fname',
-                        help=('File that contains list of model directories. ',
-                              'Each line is a directory; do not include any prefixes. ',
-                              'i.e. bdt1 instead of ~/models/bdt1'))
+                        help=('File that contains list of model directories. '
+                              'Each line is a directory; do not include any prefixes. '
+                              'i.e. bdt1 instead of args.kaggle_root/models/bdt1'))
     parser.add_argument('output_ranking_fname',
                         help='Ranking output file. Will overwrite.')
     parser.add_argument('--kaggle_root', default='../',
