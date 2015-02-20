@@ -33,7 +33,7 @@ class CvModel:
         self.models = None
 
     # Fit the model.
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, input_trans=True):
         """
         Train the cross-validated model using the training data X and y.
 
@@ -60,7 +60,7 @@ class CvModel:
         """
 
         # Input preprocessing.
-        X = self.trans.transform(X)
+        if input_trans: X = self.trans.transform(X)
 
         # Initialize the cross-validated models list.
         models = []
@@ -72,14 +72,16 @@ class CvModel:
             # Get the folds to train on. Leave the ith fold out of training.
             X_fold = np.concatenate([X[:i*fold_size], X[(i+1)*fold_size:]])
             y_fold = np.concatenate([y[:i*fold_size], y[(i+1)*fold_size:]])
-            sample_weight_fold = None
             if sample_weight is not None:
                 sample_weight_fold = np.concatenate(
                     [sample_weight[:i*fold_size], sample_weight[(i+1)*fold_size:]]
                 )
 
             # Train using the cached classifier prototype.
-            models.append(self.clf.fit(X_fold, y_fold, sample_weight=sample_weight_fold))
+            if sample_weight is not None:
+                models.append(self.clf.fit(X_fold, y_fold, sample_weight=sample_weight_fold))
+            else:
+                models.append(self.clf.fit(X_fold, y_fold))
 
         self.models = models
 
