@@ -9,7 +9,7 @@ sys.path.append(working_path)
 from pyutils.ensemble_selection.CvModel import CvModel
 from sklearn.externals import joblib
 
-rankfile_path = 'ensembles/ranks_Feb20_10am.txt'
+rankfile_path = 'ensembles/Feb20_4pm/model_ranks.txt'
 
 model_list = []
 with open(working_path+rankfile_path, 'rb') as f:
@@ -17,8 +17,18 @@ with open(working_path+rankfile_path, 'rb') as f:
         modelname, score = row.split()
         model_list.append(modelname)
 
+clf_list = []
+for mdl in model_list:
+    clf = mdl.split('/')[0]
+    clf_list.append(clf)
+print '\n'
+print 'This ranking includes:\n', sorted(list(set(clf_list)))
+
 model = sys.argv[1]
+print '\n'
+print 'Ranking %s:' % sys.argv[1]
 top_models = []
+print '\n'
 for i, mdl in enumerate(model_list):
     if not len(top_models) < 10: break
     if mdl.startswith(model):
@@ -27,30 +37,32 @@ for i, mdl in enumerate(model_list):
         cv_model = joblib.load(working_path+'models/'+mdl)
         print 'Getting its parameters...'
         param_dict = cv_model.models[0].get_params()
-        if model == 'bdt_std':
+        param_dict_trans = cv_model.trans.get_params()
+        if model == 'bdt_std' or model == 'bdt_bal':
             print 'n_estimators =', param_dict['n_estimators']
             print 'max_depth =', param_dict['base_estimator__max_depth']
-        if model == 'bdt_bal':
-            print 'n_estimators =', param_dict['n_estimators']
-            print 'max_depth =', param_dict['base_estimator__max_depth']
-        if model == 'rf_std':
-            print 'n_estimators =', param_dict['n_estimators']
-            print 'max_features =', param_dict['max_features']
-        if model == 'rf_bal':
-            print 'n_estimators =', param_dict['n_estimators']
-            print 'max_features =', param_dict['max_features']
-        if model == 'rf_noip':
-            print 'n_estimators =', param_dict['n_estimators']
-            print 'max_features =', param_dict['max_features']
-        if model == 'rf_lasso':
+        if model.startswith('rf_'):
             print 'n_estimators =', param_dict['n_estimators']
             print 'max_features =', param_dict['max_features']
         if model == 'svm_rbf':
             print 'C =', param_dict['C']
             print 'gamma =', param_dict['gamma']
+            print 'n_components =', param_dict_trans['pca__n_components']
+            print 'whiten =', str(param_dict_trans['pca__whiten'])
         if model == 'svm_poly':
             print 'C =', param_dict['C']
             print 'degree =', param_dict['degree']
         if model == 'svm_lin':
             print 'C =', param_dict['C']
-
+        if model == 'lr_std' or model == 'lr_bal':
+            print 'penalty =', param_dict['penalty']
+            print 'C =', param_dict['C']
+            print 'fit_intercept =', str(param_dict['fit_intercept'])
+            print 'n_components =', param_dict_trans['pca__n_components']
+        if model == 'gtb_std':
+            print 'loss =', param_dict['loss']
+            print 'learning_rate =', param_dict['learning_rate']
+            print 'n_estimators =', param_dict['n_estimators']
+            print 'max_depth =', param_dict['max_depth']
+            print 'subsample =', param_dict['subsample']
+        print '-'*80

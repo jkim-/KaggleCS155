@@ -12,10 +12,9 @@ import getpass
 
 param_list = [
     ['deviance'], # loss
-    [float(10**x) for x in range(-2,1)], # learning_rate
-    [64, 128, 180, 300, 400, 600, 700, 800], # n_estimators
-    [1, 3, 5], # max_depth
-    [0.5] # subsample
+    [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.], # learning_rate
+    [650, 750, 850, 900, 950, 1000], # n_estimators
+    [2, 3, 4] # max_depth
 ]
 
 for i, pars in enumerate(itertools.product(*param_list)):
@@ -33,12 +32,9 @@ for i, pars in enumerate(itertools.product(*param_list)):
     # max_depth
     arguments.append(str(pars[3]))
     
-    # subsample
-    arguments.append(str(pars[4]))
-    
     # model_fname
     arguments.append(
-        '/nfs/raid13/babar/dchao/KaggleCS155/models/gtb_std/{0}.pkl'.format(i)
+        '/nfs/raid13/babar/dchao/KaggleCS155/models/gtb_std_3/{0}.pkl'.format(i)
     )
 
     submit_file = tempfile.NamedTemporaryFile(mode='w+t', suffix='.submit')
@@ -46,12 +42,12 @@ for i, pars in enumerate(itertools.product(*param_list)):
     try:
         print 'Creating temporary submission file...'
         submit_file.writelines(['universe = vanilla\n',
-                                'executable = gtb_std.py\n',
+                                'executable = gtb_std_3.py\n',
                                 'getenv = True\n',
                                 'arguments = {0}\n'.format(' '.join(arguments)),
-                                'output = '+model_path+'/models/logs/gtb_std_'+str(i)+'.out\n',
-                                'error = '+model_path+'/models/logs/gtb_std_'+str(i)+'.error\n',
-                                'log = '+model_path+'/models/logs/gtb_std_'+str(i)+'.log\n',
+                                'output = '+model_path+'/models/logs/gtb_std_3_'+str(i)+'.out\n',
+                                'error = '+model_path+'/models/logs/gtb_std_3_'+str(i)+'.error\n',
+                                'log = '+model_path+'/models/logs/gtb_std_3_'+str(i)+'.log\n',
                                 'accounting_group = group_babar\n',
                                 'accounting_group_user = {0}\n'.format(getpass.getuser()),
                                 'queue'])

@@ -1,3 +1,7 @@
+Total number of models:
+	2028
+
+
 svm_rbf:
 
     Number of models:
@@ -11,6 +15,22 @@ svm_rbf:
         SVC(C=[float(10**x) for x in range(-7, 4)], 
             kernel='rbf',
             gamma=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1., 2.]
+        )
+
+
+svm_rbf_bal:
+
+    Number of models:
+        140
+
+    Input Preprocessing:
+        MinMaxScaler(feature_range=(-1.,1.))
+        PCA(n_components=None, whiten=True)
+
+    Classifier:
+        SVC(C=[float(50*x) for x in range(1,21)],
+            kernel='rbf',
+            gamma=[0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01]
         )
 
 
@@ -60,6 +80,22 @@ rf_std:
         )
 
 
+rf_std_2: 
+
+    Number of models:
+        66
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+        RandomForestClassifier(
+		n_estimators=[256, 512, 1024],
+		max_features=[[int(1.2**x * np.sqrt(500)) for x in range(7,18)],
+		criterion=['gini', 'entropy']
+        )
+
+
 rf_bal: 
 
     Number of models:
@@ -75,6 +111,22 @@ rf_bal:
         )
         sample_weights=[1. if yi == 0 else 3. for yi in y]
 
+
+rf_bal_2: 
+
+    Number of models:
+        66
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+        RandomForestClassifier(
+		n_estimators=[256, 512, 1024],
+		max_features=[[int(1.2**x * np.sqrt(500)) for x in range(7,18)],
+		criterion=['gini', 'entropy']
+	)
+        sample_weights=[1. if yi == 0 else 3. for yi in y]
 
 rf_noip: 
 
@@ -123,6 +175,41 @@ bdt_std:
     	)
 
 
+bdt_std_2:
+
+    Number of models:
+        120 
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+    	dtclf = DecisionTreeClassifier(max_depth=[2, 3, 4, 5])
+    	AdaBoostClassifier(
+		base_estimator=dtclf,
+		n_estimators=[int(1.2**x) for x in range(25,40)],
+		learning_rate=[0.7, 1.]
+    	)
+
+
+bdt_lasso:
+
+    Number of models:
+        360 
+
+    Input Preprocessing:
+        StandardScaler()
+	LinearSVC(C=[float(10**x) for x in range(-3,0)], penalty='l1', dual=False)
+
+    Classifier:
+    	dtclf = DecisionTreeClassifier(max_depth=[2, 3, 4, 5])
+    	AdaBoostClassifier(
+		base_estimator=dtclf,
+		n_estimators=[int(1.2**x) for x in range(25,40)],
+		learning_rate=[0.7, 1.]
+    	)
+
+
 bdt_bal:
 
     Number of models:
@@ -136,6 +223,24 @@ bdt_bal:
     	AdaBoostClassifier(
 		base_estimator=dtclf,
 		n_estimators=[int(1.5**x) for x in range(1,15)]
+    	)
+        sample_weights=[1. if yi == 0 else 3. for yi in y]
+
+
+bdt_bal_2:
+
+    Number of models:
+        120
+
+    Input Preprocessing:
+        StandardScaler()
+
+    Classifier:
+    	dtclf = DecisionTreeClassifier(max_depth=[2, 3, 4, 5])
+    	AdaBoostClassifier(
+		base_estimator=dtclf,
+		n_estimators=[int(1.2**x) for x in range(25,40)],
+		learning_rate=[0.7, 1.]
     	)
         sample_weights=[1. if yi == 0 else 3. for yi in y]
 
@@ -178,7 +283,7 @@ lr_bal:
 gtb_std:
 
     Number of models:
-        144 
+        72 
 
     Input Preprocessing:
         StandardScaler()
@@ -186,9 +291,46 @@ gtb_std:
 
     Classifier:
     	GradientBoostingClassifier(
-		loss=['deviance', 'ls'],
+		loss=['deviance'],
 		learning_rate=[float(10**x) for x in range(-2,1)],
 		n_estimators=[64, 128, 180, 300, 400, 600, 700, 800],
 		max_depth=[1, 3, 5],
 		subsample=[0.5]
+    	)
+
+
+gtb_std_2:
+
+    Number of models:
+        126 
+
+    Input Preprocessing:
+        StandardScaler()
+        PCA(n_components=None, whiten=True)
+
+    Classifier:
+    	GradientBoostingClassifier(
+		loss=['deviance'],
+		learning_rate=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.],
+		n_estimators=[650, 750, 850, 900, 950, 1000],
+		max_depth=[2, 3, 4],
+		subsample=[0.5]
+    	)
+
+
+gtb_std_3:
+
+    Number of models:
+        126 
+
+    Input Preprocessing:
+        StandardScaler()
+        PCA(n_components=None, whiten=True)
+
+    Classifier:
+    	GradientBoostingClassifier(
+		loss=['deviance'],
+		learning_rate=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.],
+		n_estimators=[650, 750, 850, 900, 950, 1000],
+		max_depth=[2, 3, 4]
     	)

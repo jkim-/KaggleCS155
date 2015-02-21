@@ -11,34 +11,34 @@ import itertools
 import getpass
 
 param_list = [
-    ['deviance'], # loss
-    [float(10**x) for x in range(-2,1)], # learning_rate
-    [64, 128, 180, 300, 400, 600, 700, 800], # n_estimators
-    [1, 3, 5], # max_depth
-    [0.5] # subsample
+    [float(50*x) for x in range(1,21)], # C
+    ['rbf'], # kernel
+    [0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.005, 0.01], # gamma (of rbf kernel)
+    ['None'], # n_components (for pca)
+    ['True'] # whiten (for pca)
 ]
 
 for i, pars in enumerate(itertools.product(*param_list)):
     arguments = []
 
-    # loss
+    # C
     arguments.append(str(pars[0]))
 
-    # learning_rate
+    # kernel
     arguments.append(str(pars[1]))
 
-    # n_estimators 
+    # gamma 
     arguments.append(str(pars[2]))
 
-    # max_depth
+    # n_components
     arguments.append(str(pars[3]))
-    
-    # subsample
+
+    # whiten
     arguments.append(str(pars[4]))
-    
+
     # model_fname
     arguments.append(
-        '/nfs/raid13/babar/dchao/KaggleCS155/models/gtb_std/{0}.pkl'.format(i)
+        '/nfs/raid13/babar/dchao/KaggleCS155/models/svm_rbf_bal/{0}.pkl'.format(i)
     )
 
     submit_file = tempfile.NamedTemporaryFile(mode='w+t', suffix='.submit')
@@ -46,12 +46,12 @@ for i, pars in enumerate(itertools.product(*param_list)):
     try:
         print 'Creating temporary submission file...'
         submit_file.writelines(['universe = vanilla\n',
-                                'executable = gtb_std.py\n',
+                                'executable = svm_rbf_bal.py\n',
                                 'getenv = True\n',
                                 'arguments = {0}\n'.format(' '.join(arguments)),
-                                'output = '+model_path+'/models/logs/gtb_std_'+str(i)+'.out\n',
-                                'error = '+model_path+'/models/logs/gtb_std_'+str(i)+'.error\n',
-                                'log = '+model_path+'/models/logs/gtb_std_'+str(i)+'.log\n',
+                                'output = '+model_path+'/models/logs/svm_rbf_bal_'+str(i)+'.out\n',
+                                'error = '+model_path+'/models/logs/svm_rbf_bal_'+str(i)+'.error\n',
+                                'log = '+model_path+'/models/logs/svm_rbf_bal_'+str(i)+'.log\n',
                                 'accounting_group = group_babar\n',
                                 'accounting_group_user = {0}\n'.format(getpass.getuser()),
                                 'queue'])
