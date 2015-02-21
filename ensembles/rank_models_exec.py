@@ -1,3 +1,5 @@
+#! /nfs/raid13/babar/software/anaconda/bin/python
+
 if __name__ == '__main__':
 
     import argparse
@@ -8,7 +10,7 @@ if __name__ == '__main__':
                               'i.e. bdt1 instead of args.kaggle_root/models/bdt1'))
     parser.add_argument('output_ranking_fname',
                         help='Ranking output file. Will overwrite.')
-    parser.add_argument('--kaggle_root', default='../',
+    parser.add_argument('--kaggle_root', default='/nfs/raid13/babar/dchao/KaggleCS155',
                         help='Root directry of the kaggle project.')
     args = parser.parse_args()
 
