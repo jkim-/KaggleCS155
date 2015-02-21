@@ -45,4 +45,4 @@ if __name__ == '__main__':
         subprocess.check_call(['condor_submit', submit_file.name])
         time.sleep(1)
         print 'Submitted the following command:'
-        print 'assemble_ensemble_exec.py {0}'.format(' '.join(arguments))
+        print 'predict_submission_exec.py {0}'.format(' '.join(arguments))
