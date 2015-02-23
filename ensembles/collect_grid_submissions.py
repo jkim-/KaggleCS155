@@ -45,4 +45,4 @@ if __name__ == '__main__':
         try:
             shutil.copyfile(ensemble_submit_fname, submission_fname)
         except IOErroor:
-            print 'Error when copying {0} to {1}'.format(ensemble_submit_fname, submission_fname)
+            print 'Error when copying {0} to {1} (check if {0} exists.)'.format(ensemble_submit_fname, submission_fname)
