@@ -9,6 +9,8 @@ if __name__ == '__main__':
                               'It should also contain model_ranks.txt; '
                               'see rank_models.py. '
                               'This is a relative path w.r.t. this script.' ))
+    parser.add_argument('--rounds', default=None, 
+                        help=('Number of rounds for hill climbing.'))
     parser.add_argument('--kaggle_root', default='/nfs/raid13/babar/dchao/KaggleCS155',
                         help='Root directry of the kaggle project.')
     args = parser.parse_args()
@@ -62,6 +64,8 @@ if __name__ == '__main__':
             '--n_init={0}'.format(n_init),
             '--kaggle_root={0}'.format(args.kaggle_root),
         ]
+        if args.rounds:
+          arguments.append('--rounds={0}'.format(args.rounds))
 
         # Create temporary submission file, then submit to condor
         with tempfile.NamedTemporaryFile(mode='w+t', suffix='.submit') as submit_file:

@@ -28,9 +28,22 @@ if __name__ == '__main__':
     for fname in os.listdir(basedir_abs):
         try:
             match = re.match('br[0-9]+_p[0-9]+_bp[0-9]+_ni[0-9]+', fname)
-            ensemble_basedirs.append(match.group(0))
+
+            # Only perform prediction on those directories that have a 
+            # trained ensemble that has not yet been used for prediction.
+            npkl = len(os.listdir(basedir_abs + '/' +  match.group(0) + '/model'))
+            is_predicted = 'predict.log' in os.listdir(basedir_abs + '/' + match.group(0))
+            if npkl > 0 and not is_predicted:
+              ensemble_basedirs.append(match.group(0))
         except AttributeError:
             continue
+
+    if len(ensemble_basedirs) > 0:
+        print 'Submitting these ensembles for prediction:'
+        for en in ensemble_basedirs:
+            print '\t{0}'.format(en)
+    else:
+        print 'Nothing to submit.'
 
     # Submit jobs for each pickled ensemble 
     for ensemble_dir in ensemble_basedirs:
