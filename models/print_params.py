@@ -9,13 +9,16 @@ sys.path.append(working_path)
 from pyutils.ensemble_selection.CvModel import CvModel
 from sklearn.externals import joblib
 
-rankfile_path = 'ensembles/Feb20_4pm/model_ranks.txt'
+rankfile_path = 'ensembles/Feb20_6pm/model_ranks.txt'
 
 model_list = []
+errors = []
 with open(working_path+rankfile_path, 'rb') as f:
+    next(f)
     for row in f:
-        modelname, score = row.split()
+        modelname, error = row.split()
         model_list.append(modelname)
+        errors.append(error)
 
 clf_list = []
 for mdl in model_list:
@@ -26,14 +29,14 @@ print 'This ranking includes:\n', sorted(list(set(clf_list)))
 
 model = sys.argv[1]
 print '\n'
-print 'Ranking %s:' % sys.argv[1]
+print '''Ranking top 10 {0}'s out of {1} models:'''.format(sys.argv[1], len(model_list))
 top_models = []
 print '\n'
 for i, mdl in enumerate(model_list):
     if not len(top_models) < 10: break
-    if mdl.startswith(model):
+    if mdl.split('/')[0] == model:
         top_models.append(mdl)
-        print 'Loading model', len(top_models), '... (Overall ranking: %d)' % i
+        print 'Loading model', len(top_models), '(Overall ranking: {0} with error {1})...'.format(i, errors[i])
         cv_model = joblib.load(working_path+'models/'+mdl)
         print 'Getting its parameters...'
         param_dict = cv_model.models[0].get_params()
