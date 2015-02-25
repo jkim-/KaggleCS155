@@ -49,7 +49,7 @@
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
 
-\graphicspath{{../pyutils/preprocessing/}}
+\graphicspath{{plots/}}
 
 \title{CS155 Kaggle Project Report}
 \author{Daniel Chao\thanks{Team partners listed alphabetically.} \and Jae Hong Kim\footnotemark[1]}
@@ -63,7 +63,7 @@
 \section{Overview}
 The objective of CS155 Kaggle project was to classify the annual reports by publicly traded companies to the U.S. Securities and Exchange Commission on whether it was submitted during the Great Recession from Dec. 2007 to Jun. 2009 or not.  The data is given to us in two different formats, which will be discussed in more detail in Section~\ref{sec:models}, and consists of 4000 documents and their labels for the training data set and 9868 documents for the test data set where each document is represented as a point in a 500 dimensional feature space.  In addition, we are given public leaderboard during the competition to which we can submit our predictions and receive the feedback based on $40\%$ of the test set.  Although the public leaderboard was a useful tool to gauge our current status, we tried not to rely on it too much as we did not want to overfit on that specific test set.  
 
-Our approach to the project was to use ensemble selection \cite{caruana04}, which requires generation of a large model library and implementation of the ensemble assembly.  Within our team, Jae focused on generating the model library using \texttt{scikit-learn} implementations and Daniel focused on ensemble selection which did not use any pre-existing packages.
+Our approach to the project was to use ensemble selection \cite{caruana04}, which requires generation of a large model library and implementation of the ensemble assembly.  Within our team, Jae focused on generating the model library using \texttt{scikit-learn} implementations and Daniel focused on ensemble selection which did not use any pre-existing packages.  Our team handle on the Kaggle site was "DrOPitlikEitshot".
 
 \section{Generating the model library} \label{sec:models}
 In this section, we present brief descriptions of the approximately 2000 models that make up our model library.  Ensemble selection requires overproducing a large number of classifiers for various learning algorithms.  Each model consists of a unique combination of input processing and an instantiation of a learning algorithm that is used to transform and fit the training data set and predict the labels of the test data set.  All input processing and learning algorithms used were \texttt{scikit-learn} implementations.  
@@ -133,7 +133,7 @@ L1-based feature selection uses the fact that linear models regularized by the L
 Describe how ensemble selection was performed. Also describe methods for regularizing the ensemble. 
 
 \section{Conclusion **add anything you want to improve**}
-In the end, the ensembles with high number of rounds of bagging simply took too long to run, so our final submissions were not as optimal as we planned.  For building the model library, it would have been better to explore different learning algorithms including neural network and unsupervised learning such as k-Nearest Neighbors, and to have a more systematic way of searching for well-performing regions in the parameter grid.
+In the end, the ensembles with high number of rounds of bagging simply took too long to run, so our final submissions were not as optimal as we planned.  For building the model library, it would have been better to explore different learning algorithms including neural network and unsupervised learning such as k-Nearest Neighbors, and to have a more systematic way of searching for well-performing regions in the parameter grid.  Furthermore, we didn't pursue too deeply into effciently training the data such as taking adventage of the sparsity.  
 
 \begin{thebibliography}{99}
 \bibitem{caruana04}
