@@ -61,12 +61,18 @@
 \tableofcontents 
 
 \section{Overview}
-The objective of CS155 Kaggle project was to classify the annual reports by publicly traded companies to the U.S. Securities and Exchange Commission on whether it was submitted during the Great Recession from Dec. 2007 to Jun. 2009 or not.  The data is given to us in two different formats, which will be discussed in more detail in Section~\ref{sec:models}, and consists of 4000 documents and their labels for the training data set and 9868 documents for the test data set where each document is represented as a point in a 500 dimensional feature space.  In addition, we are given public leaderboard during the competition to which we can submit our predictions and receive the feedback based on $40\%$ of the test set.  Although the public leaderboard was a useful tool to gauge our current status, we tried not to rely on it too much as we did not want to overfit on that specific test set.  
+The objective of the CS155 Kaggle project was to classify whether a financial report from a publically traded company was submitted to the U.S. Securities and Exchange Commission during the \href{http://en.wikipedia.org/wiki/Great_Recession}{Great Recession}.  
 
-Our approach to the project was to use ensemble selection \cite{caruana04}, which requires generation of a large model library and implementation of the ensemble assembly.  Within our team, Jae focused on generating the model library using \texttt{scikit-learn} implementations and Daniel focused on ensemble selection which did not use any pre-existing packages.  Our team handle on the Kaggle site was "DrOPitlikEitshot".
+We are given data represented as a bag of words consisting of the most frequently occuring word stems. The training set consists of 4000 documents with their target labels while the testing set consists of 9868 documents. In addition to the bag of words representation, we are also given the tf-idf preprocessed version of the same dataset. Our approach to the project was to work exclusively with the tf-idf preprocessed data, which consisted of 500 features, and use ensemble selection \cite{caruana04} to pool over a large model library.  
+
+Within our team, Jae focused on generating the model library using \texttt{scikit-learn}, and Daniel custom implemented ensemble selection using python according to the descriptions in R. Caruana's paper. Our code and implementations are in \href{https://github.com/jkim-/KaggleCS155}{this} github repository. 
+
+Our team handle was ``DrOPitlikEitshot". 
 
 \section{Generating the model library} \label{sec:models}
-In this section, we present brief descriptions of the approximately 2000 models that make up our model library.  Ensemble selection requires overproducing a large number of classifiers for various learning algorithms.  Each model consists of a unique combination of input processing and an instantiation of a learning algorithm that is used to transform and fit the training data set and predict the labels of the test data set.  All input processing and learning algorithms used were \texttt{scikit-learn} implementations.  
+In this section, we present brief descriptions of the approximately 2000 models that make up our model library.  Each model consists of a unique combination of input processing and an instantiation of a learning algorithm that is used to transform and fit the training data set and predict the labels of the test data set.  All input processing and learning algorithms used were \texttt{scikit-learn} implementations.  
+
+We note in particular that the model library is assembled without consulting the leader board. 
 
   \subsection{Input processing}
 
@@ -129,11 +135,48 @@ L1-based feature selection uses the fact that linear models regularized by the L
       We generated various instantiations of random forest by varying the input processing, from centering and normalizing to feature selection using Lasso.  We tried learning on the raw unprocessed data, but the performance of those random forests were mediocre at best.  In addition, we vary the number of trees in the forest $\{256, 512, 1024\}$, the number of features to be considered for each split between 1 and 500, and the criterion for splitting between gini and information gain.  We also try balancing the data for some models.   
   \end{itemize}
 
-\section{Ensemble selection (Dan)} \label{sec:ensemble}
-Describe how ensemble selection was performed. Also describe methods for regularizing the ensemble. 
+\section{Ensemble selection} \label{sec:ensemble}
+We first describe our implementation of ensemble selection, then we describe how it was used in our submission strategy.
 
-\section{Conclusion **add anything you want to improve**}
-In the end, the ensembles with high number of rounds of bagging simply took too long to run, so our final submissions were not as optimal as we planned.  For building the model library, it would have been better to explore different learning algorithms including neural network and unsupervised learning such as k-Nearest Neighbors, and to have a more systematic way of searching for well-performing regions in the parameter grid.  Furthermore, we didn't pursue too deeply into effciently training the data such as taking adventage of the sparsity.  
+\subsection{Ensemble selection implementation}
+We wrote a custom python package that implements ensemble selection described in \cite{caruana04} and \cite{caruana06}. It is written specifically to work with \texttt{scikit-learn}; thus, many of our design decisions were based on the structure of its API. The key features that we implemented are listed below.
+\begin{itemize}
+  \item Forward stepwise selection: This is the main routine of ensemble selection and is described in the introduction of \cite{caruana04}. Notable features we implement are sorted ensemble initialization and model selection with replacement. All of these are described in detail in \cite{caruana04}. An additional feature we implement is early stopping in order to save CPU cycles for when the hill climbing error plateaus. 
+
+  \item Ensemble bagging: This is way of to counter overfitting. It randomly chooses some prespecfied percentage of all available models and uses those as the model library for hill climbing. It then does this for some prespecified number of rounds and takes a vote among all bagged ensembles for the final decision. This procedure is described in detail in \cite{caruana04}.
+
+  \item Cross-validated models: Since the efficacy of ensemble selection depends strongly on the size of the hill climbing set, we wanted to get the most out of the training data by using cross validation. We implemented the training and prediction of the so called ``cross-validated models'' described in \cite{caruana06}. This basically expands a single model to a team of $K$ models for $K$-fold cross validation. Predicting out of sample points is a vote among all $K$ team members, while predicting in sample points is the single decision of the member that did not train on the given point. 
+
+  \item Model library pruning: We add an option to use just the top-$p$\% performing models in the base library. 
+\end{itemize}
+
+\subsection{Ensemble training and submission strategy}
+Though our code was designed to be able to train any number of folds of cross validated models, we chose to uniformly train 5-fold models. In hindsight, this was too greedy as we did not anticipate the long time ensemble selection took to train and predict; probably a 2-fold strategy would have been more prudent given the time limit of the project. 
+
+We specify a baseline ensemble model. These are based on the suggestions in \cite{caruana06}. The parameter settings are as follows:
+\begin{itemize}
+  \item Rounds of ensemble bagging: $20$.
+  \item Percentage of models to use in each bag: $20\%$.
+  \item Model pruning percentage: $20\%$. 
+  \item Hill climbing early stopping: Fixed $15$ rounds of hillclimbing. This is suboptimal, but we had to truncate since we underestimated how long ensemble selection takes; however, the hillclimbing error did indeed plateau for most bag samples ($\approx 18$ out of $20$).
+\end{itemize}
+The ensemble training can be performed as the model library becomes ready. In practice, it is run whenever Jae reports that he has a bigger and better model library.
+
+The way \cite{caruana04} views ensemble parameter tuning is as a type of regularization. In particular, tuning the bagging rounds, pruning percentage, etc. is akin to tuning $\lambda$ as in Lasso for example. We also take this view and use the leaderboard as the basis for tuning this ``$\lambda$''. In the end, we submit the following two ensembles assembled using the latest model library for final scoring:
+\begin{enumerate}
+  \item The baseline model: This is the model that is not influenced by how we are doing on the leaderboard. 
+  \item The ensemble that does best on the leader board based on tuning the ensemble parameters: This is like tuning the regularization parameter on a held out sample. Unfortunately, we were not able to submit as many ensembles to Kaggle as we would have liked since certain parameter settings simply took too long to train or predict. 
+\end{enumerate}
+
+
+\section{Conclusion}
+In the end, our performance was about average. 
+
+The Achilles heel of our ensemble selection was that we were too greedy in choosing 5-fold vs smaller folds; e.g. 2-fold. Actually, we probably just underestimated how long ensemble selection would actually take; in our case, the running time was spent mostly on evaluating the individual \texttt{scikit-learn} models. Though many ensembles finished, we would have been able to better tune ensemble performance based on the leaderboard. 
+
+For building the model library, it would have been better to explore a more diverse set of learning algorithms and models; e.g. neural network and unsupervised learning such as k-Nearest Neighbors. Another improvement would to also have a more systematic way of searching for well-performing regions in the parameter grid of each model. 
+
+Furthermore, we didn't pursue taking advantage of existing structure in the data; e.g. sparsity and further feature extraction. 
 
 \begin{thebibliography}{99}
 \bibitem{caruana04}
@@ -141,6 +184,11 @@ In the end, the ensembles with high number of rounds of bagging simply took too 
   (2006).
   Ensemble selection from libraries of models.
   \emph{ICML '04}.
+\bibitem{caruana06}
+  R. Caruana, A. Munson, A. Niculescu-Mizil.
+  (2006).
+  Getting the Most Out of Ensemble Selection.
+  \emph{Technical Report 2006-2045}.
 \bibitem{KDD}
   A. Niculescu-Mizil \emph{et al}.
   (2009).
